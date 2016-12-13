@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spm.dao.UserDao">
+<resultMap type="com.spm.model.UserBean" id="resultUser">
+<id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
+<result property="name" column="name" javaType="String" jdbcType="VARCHAR"/>
+<result property="pwd" column="pwd" javaType="String" jdbcType="VARCHAR"/>
+<result property="userCode" column="user_code" javaType="String" jdbcType="VARCHAR"/>
+<result property="address" column="address" javaType="String" jdbcType="VARCHAR"/>
+<result property="sex" column="sex" javaType="Integer" jdbcType="INTEGER"/>
+<result property="sexName" column="sexName" javaType="String" jdbcType="VARCHAR"/>
+<result property="createDate" column="create_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="createUser" column="create_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateDate" column="update_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateUser" column="update_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="deleteFlag" column="delete_flag" javaType="String" jdbcType="VARCHAR"/>
+
+</resultMap>
+	
+<select id="login" parameterType="com.spm.model.UserBean" resultMap="resultUser">
+select * from userbean where user_code=#{userCode} and pwd=#{pwd} and delete_flag='F'
+</select>
+
+<update id="updateEntityById" parameterType="com.spm.model.DataBean">
+	update userbean set
+		update_date = sysdate(),
+		update_user = #{updateUser}
+		<if test="name!=null and name!=''">
+			,name = #{name}
+		</if>
+		<if test="pwd!=null and pwd!=''">
+			,pwd = #{pwd}
+		</if>
+		<if test="userCode!=null and userCode!=''">
+			,user_code = #{userCode}
+		</if>
+	where id = #{id}
+</update>
+</mapper>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spm.dao.StudentDao">
+<resultMap type="com.spm.model.Student" id="resultStu">
+<id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
+<result property="name" column="name" javaType="String" jdbcType="VARCHAR"/>
+<result property="parentName" column="parentName" javaType="String" jdbcType="VARCHAR"/>
+<result property="state" column="state" javaType="String" jdbcType="VARCHAR"/>
+<result property="className" column="className" javaType="String" jdbcType="VARCHAR"/>
+<result property="year1" column="year1" javaType="Integer" jdbcType="INTEGER"/>
+<result property="year2" column="year2" javaType="Integer" jdbcType="INTEGER"/>
+<result property="xueqi" column="xueqi" javaType="Integer" jdbcType="INTEGER"/>
+<result property="createDate" column="create_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="createUser" column="create_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateDate" column="update_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateUser" column="update_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="deleteFlag" column="delete_flag" javaType="String" jdbcType="VARCHAR"/>
+<result property="sf.no" column="no" javaType="String" jdbcType="VARCHAR"/>
+<result property="sf.total" column="total" javaType="double" jdbcType="NUMERIC"/>
+<result property="sf.kaipiaoren" column="kaipiaoren" javaType="String" jdbcType="VARCHAR"/>
+<result property="sf.shoukuanren" column="shoukuanren" javaType="String" jdbcType="VARCHAR"/>
+</resultMap>
+
+
+
+<sql id="suffer">
+	<if test="name!='' and name!=null">
+	and  a.name = #{name}
+	</if>
+	<if test="parentName!='' and parentName!=null">
+	and  a.parentName = #{parentName}
+	</if>
+	<if test="className!='' and className!=null">
+	and  a.className = #{className}
+	</if>
+	<if test="state!='' and state!=null">
+	and  a.state like '%${state}%'
+	</if>
+	<if test="xueqi!='' and xueqi!=null and xueqi!=0">
+	and  a.xueqi = #{xueqi}
+	</if>
+	<if test="year1!='' and year1!=null and year1!=0">
+	and  a.year1 = #{year1}
+	</if>
+	<if test="year2!='' and year2!=null and year2!=0">
+	and  a.year2 = #{year2}
+	</if>
+	<if test="sfsf!='' and sfsf!=null and sfsf!=0">
+	and  b.total is null
+	</if>
+</sql>
+
+<sql id="suffer2">
+	id,name,state,parentName,className,year1,year2,xueqi,create_date,create_user,update_date,
+		update_user,delete_flag
+</sql>
+
+
+<sql id="suffer3">
+	a.id,a.name,a.state,a.parentName,a.className,a.year1,a.year2,a.xueqi,a.create_date,a.create_user,a.update_date,
+		a.update_user,a.delete_flag,b.total,b.no,b.kaipiaoren,b.shoukuanren
+</sql>
+
+<select id="findLikeEntity" resultMap="resultStu" parameterType="com.spm.model.Student">
+	select c.* from (	
+		select 
+		<include refid="suffer3"/>
+		  from student a
+		 left join shoufei b on a.id = b.stuId and b.delete_flag='F'
+		  where 1=1 and a.delete_flag='F'
+		<include refid="suffer"/>
+		limit #{num1} , #{num2}
+	) c
+</select>
+
+<select id="findCount" resultType="int" parameterType="com.spm.model.Student">
+	select count(id) from (	
+	select 
+		<include refid="suffer3"/>
+		 from student a
+		 left join shoufei b on a.id = b.stuId and b.delete_flag='F'
+		  where 1=1 and a.delete_flag='F'
+		<include refid="suffer"/>
+	) c
+</select>
+
+<select id="findEntityById" parameterType="int" resultMap="resultStu" >
+	select 
+		<include refid="suffer2"/>
+		 from student where 1=1 and delete_flag='F' and id=#{id}
+</select>
+
+
+<select id="isExist" resultType="int" parameterType="com.spm.model.Student">
+	select count(1) from student a
+	where a.delete_flag='F' and a.name=#{name}
+	<include refid="suffer"/>
+</select>
+
+
+<insert id="insertEntity" parameterType="com.spm.model.Student">
+	insert into student(name,parentName,state,className,year1,year2,xueqi,create_date,create_user,update_date,
+		update_user,delete_flag) 
+				 values(#{name},#{parentName},#{state},#{className},#{year1},#{year2},#{xueqi},sysdate(),#{createUser},
+		sysdate(),#{updateUser},'F')
+</insert>
+
+<update id="deleteEntityById" parameterType="com.spm.model.Student">
+	update student set
+	update_date = sysdate(),
+	update_user = #{updateUser},
+	delete_flag ='T'
+	where id =#{id}
+</update>
+
+
+<update id="updateEntityById" parameterType="com.spm.model.Student">
+	update student set
+	update_date = sysdate(),
+	update_user = #{updateUser}
+	<if test="name!=null and name!=''">
+	,name = #{name}
+	</if>
+	<if test="state!=null and state!=''">
+	,state = #{state}
+	</if>
+	<if test="className!=null and className!=''">
+	,className = #{className}
+	</if>
+	<if test="year1!=null and year1!=''">
+	,year1 = #{year1}
+	</if>
+	<if test="year2!=null and year2!=''">
+	,year2 = #{year2}
+	</if>
+	<if test="xueqi!=null and xueqi!=''">
+	,xueqi = #{xueqi}
+	</if>
+	<if test="parentName!=null and parentName!=''">
+	,parentName = #{parentName}
+	</if>
+	where id =#{id}
+</update>
+</mapper>

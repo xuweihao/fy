@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spm.dao.ShoufeiDao">
+<resultMap type="com.spm.model.ShoufeiBean" id="resultShoufei">
+<id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
+<result property="name" column="name" javaType="String" jdbcType="VARCHAR"/>
+<result property="no" column="no" javaType="String" jdbcType="VARCHAR"/>
+<result property="stuId" column="stuId" javaType="Integer" jdbcType="INTEGER"/>
+<result property="state" column="state" javaType="String" jdbcType="VARCHAR"/>
+<result property="className" column="className" javaType="String" jdbcType="VARCHAR"/>
+<result property="year1" column="year1" javaType="Integer" jdbcType="INTEGER"/>
+<result property="year2" column="year2" javaType="Integer" jdbcType="INTEGER"/>
+<result property="xueqi" column="xueqi" javaType="Integer" jdbcType="INTEGER"/>
+<result property="kaipiaoren" column="kaipiaoren" javaType="String" jdbcType="VARCHAR"/>
+<result property="shoukuanren" column="shoukuanren" javaType="String" jdbcType="VARCHAR"/>
+<result property="type1" column="type1" javaType="String" jdbcType="VARCHAR"/>
+<result property="price1" column="price1" javaType="double" jdbcType="NUMERIC"/>
+<result property="type2" column="type2" javaType="String" jdbcType="VARCHAR"/>
+<result property="price2" column="price2" javaType="double" jdbcType="NUMERIC"/>
+<result property="total" column="total" javaType="double" jdbcType="NUMERIC"/>
+<result property="mobile" column="mobile" javaType="String" jdbcType="VARCHAR"/>
+<result property="remark" column="remark" javaType="String" jdbcType="VARCHAR"/>
+<result property="createDate" column="create_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="createUser" column="create_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateDate" column="update_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateUser" column="update_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="deleteFlag" column="delete_flag" javaType="String" jdbcType="VARCHAR"/>
+	
+</resultMap>
+
+<sql id="suffer">
+	<if test="name!='' and name!=null">
+	and  name = #{name}
+	</if>
+	<if test="no!='' and no!=null">
+	and  no = #{no}
+	</if>
+	<if test="state!='' and state!=null">
+	and  state like '%${state}%'
+	</if>
+	<if test="xueqi!='' and xueqi!=null and xueqi!=0">
+	and  xueqi = #{xueqi}
+	</if>
+	<if test="year1!='' and year1!=null and year1!=0">
+	and  year1 = #{year1}
+	</if>
+	<if test="year2!='' and year2!=null and year2!=0">
+	and  year2 = #{year2}
+	</if>
+</sql>
+
+<sql id="suffer2">
+	id,name,no,stuId,state,className,year1,year2,xueqi,kaipiaoren,shoukuanren,type1,
+		price1,type2,price2,total,mobile,remark,create_date,create_user,update_date,
+		update_user,delete_flag
+</sql>
+
+<select id="findLikeEntity" resultMap="resultShoufei" parameterType="com.spm.model.ShoufeiBean">
+	select a.* from (	
+		select 
+		<include refid="suffer2"/>
+		 from shoufei where 1=1 and delete_flag='F'
+		<include refid="suffer"/>
+		limit #{num1} , #{num2}
+	) a
+</select>
+
+<select id="findCount" resultType="int" parameterType="com.spm.model.ShoufeiBean">
+	select count(id) from (	
+	select 
+		<include refid="suffer2"/>
+		 from shoufei where 1=1 and delete_flag='F'
+		<include refid="suffer"/>
+	) a
+</select>
+
+
+<select id="findEntityById" resultMap="resultShoufei"  parameterType="int" >
+select <include refid="suffer2"/> 
+from shoufei where 1=1 and delete_flag='F'
+		and id=#{id}
+</select>
+
+
+<select id="findShoufeiByNo" resultMap="resultShoufei"  parameterType="String">
+select 
+<include refid="suffer2"/>
+ from shoufei where 1=1 
+		and no=#{no}
+</select> 
+
+<select id="findShoufeiByStuId" resultMap="resultShoufei"  parameterType="int">
+select 
+<include refid="suffer2"/>
+ from shoufei where 1=1  and delete_flag='F'
+		and stuId = #{stuId}
+</select> 
+
+
+
+<insert id="insertEntity" parameterType="com.spm.model.ShoufeiBean">
+<selectKey keyColumn="no" keyProperty="no" resultType="String" order="BEFORE">
+select (case when no is null then 1 else (no+1) end) no
+from (select max(no) no from shoufei) f
+</selectKey>
+	insert into shoufei(name,no,stuId,state,className,year1,year2,xueqi,kaipiaoren,shoukuanren,type1,price1,type2,price2,total,mobile,remark,create_date,create_user,update_date,
+		update_user,delete_flag) 
+				 values(#{name},#{no},#{stuId},#{state},#{className},#{year1},#{year2},#{xueqi},#{kaipiaoren},#{shoukuanren},#{type1},#{price1},#{type2},#{price2},#{total},#{mobile},
+		#{remark},sysdate(),#{createUser},sysdate(),#{updateUser},'F')
+</insert>
+
+
+<update id="updateEntityById" parameterType="com.spm.model.ShoufeiBean">
+update shoufei set 
+	update_date = sysdate(),
+	update_user = #{updateUser}
+	<if test="name!=null and name!=''">
+	,name = #{name}
+	</if>
+	<if test="state!=null and state!=''">
+	,state = #{state}
+	</if>
+	<if test="className!=null and className!=''">
+	,className = #{className}
+	</if>
+	<if test="year1!=null and year1!=''">
+	,year1 = #{year1}
+	</if>
+	<if test="year2!=null and year2!=''">
+	,year2 = #{year2}
+	</if>
+	<if test="xueqi!=null and xueqi!=''">
+	,xueqi = #{xueqi}
+	</if>
+	<if test="kaipiaoren!=null and kaipiaoren!=''">
+	,kaipiaoren = #{kaipiaoren}
+	</if>
+	<if test="shoukuanren!=null and shoukuanren!=''">
+	,shoukuanren = #{shoukuanren}
+	</if>
+	<if test="type1!=null and type1!=''">
+	,type1 = #{type1}
+	</if>
+	<if test="price1!=null and price1!=''">
+	,price1 = #{price1}
+	</if>
+	<if test="type2!=null and type2!=''">
+	,type2 = #{type2}
+	</if>
+	<if test="price2!=null and price2!=''">
+	,price2 = #{price2}
+	</if>
+	<if test="total!=null and total!=''">
+	,total = #{total}
+	</if>
+	<if test="mobile!=null and mobile!=''">
+	,mobile = #{mobile}
+	</if>
+	<if test="remark!=null and remark!=''">
+	,remark = #{remark}
+	</if>
+where id = #{id}
+</update>
+
+
+<update id="deleteEntityById" parameterType="com.spm.model.ShoufeiBean">
+update shoufei set 
+	update_date = sysdate(),
+	update_user = #{updateUser},
+	delete_flag = 'T'
+where id = #{id}
+</update>
+</mapper>

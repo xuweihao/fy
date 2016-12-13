@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spm.dao.WordDao">
+<resultMap type="com.spm.model.Word" id="resultWord">
+<id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
+<result property="chinese" column="chinese" javaType="String" jdbcType="VARCHAR"/>
+<result property="english" column="english" javaType="String" jdbcType="VARCHAR"/>
+<result property="example" column="example" javaType="String" jdbcType="VARCHAR"/>
+<result property="type" column="type" javaType="String" jdbcType="VARCHAR"/>
+<result property="createDate" column="create_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="createUser" column="create_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateDate" column="update_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateUser" column="update_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="deleteFlag" column="delete_flag" javaType="String" jdbcType="VARCHAR"/>
+</resultMap>
+
+<sql id="suffix">
+	id,chinese,english,example,type,create_date,create_user,update_date,update_user,delete_flag
+</sql>
+
+<sql id="suffix2">
+	<if test="chinese!=null and chinese!=''">
+		and	chinese like '${chinese}%'
+	</if>
+	<if test="english!=null and english!=''">
+		and	english like '${english}%'
+	</if>
+	<if test="type!=null and type!=''">
+		and	type =#{type}
+	</if>
+</sql>
+
+<sql id="suffix3">
+	<if test="chinese!=null and chinese!=''">
+		and	chinese like '%${chinese}%'
+	</if>
+	<if test="english!=null and english!=''">
+		and	english like '%${english}%'
+	</if>
+	<if test="type!=null and type!=''">
+		and	type =#{type}
+	</if>
+</sql>
+
+<select id="findLikeEntity" parameterType="com.spm.model.Word" resultMap="resultWord">
+	select * from (
+		select 
+		id,chinese,english,example,type,create_date,create_user,update_date,update_user,delete_flag
+		from word
+		where 1=1 and delete_flag='F'
+		<include refid="suffix2"/>
+		union
+		select 
+		id,chinese,english,example,type,create_date,create_user,update_date,update_user,delete_flag
+		from word
+		where 1=1 and delete_flag='F'
+		<include refid="suffix3"/>
+	) a
+	<!-- <if test="chinese!=null and chinese!=''">
+		order by chinese
+	</if>
+	<if test="english!=null and english!=''">
+		order by english
+	</if> -->
+</select>
+
+
+<select id="findEntityById" parameterType="int" resultMap="resultWord">
+	select 
+		id,chinese,english,example,type,create_date,create_user,update_date,update_user,delete_flag
+		from word
+		where 1=1 and id=#{id}
+</select>
+
+<insert id="insertEntity"  parameterType="com.spm.model.Word">
+	insert into word(chinese,english,example,type,create_date,create_user,update_date,update_user,delete_flag)
+	values(#{chinese},#{english},#{example},#{type},sysdate(),#{createUser},sysdate(),#{updateUser},'F')
+</insert>
+
+<update id="updateEntityById" parameterType="com.spm.model.Word">
+	update word set
+	update_date = sysdate(),
+	update_user = #{updateUser}
+	<if test="chinese!=null and chinese!=''">
+		,	chinese =#{chinese}
+	</if>
+	<if test="english!=null and english!=''">
+		,	english =#{english}
+	</if>
+	<if test="example!=null and example!=''">
+		,	example =#{example}
+	</if>
+	<if test="type!=null and type!=''">
+		,	type =#{type}
+	</if>
+	where id = #{id}
+</update>
+
+<update id="deleteEntityById"  parameterType="com.spm.model.Word">
+	update word set
+	update_date = sysdate(),
+	update_user = #{updateUser},
+	delete_flag = 'T'
+	where id = #{id}
+</update>
+</mapper>

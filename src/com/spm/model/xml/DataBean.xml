@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spm.dao.DataBeanDao">
+<resultMap type="com.spm.model.DataBean" id="resultData">
+<id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
+<id property="pId" column="pId" javaType="Integer" jdbcType="INTEGER"/>
+<result property="dataName" column="dataName" javaType="String" jdbcType="VARCHAR"/>
+<result property="dataCode" column="dataCode" javaType="String" jdbcType="VARCHAR"/>
+<result property="createDate" column="create_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="createUser" column="create_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateDate" column="update_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateUser" column="update_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="deleteFlag" column="delete_flag" javaType="String" jdbcType="VARCHAR"/>
+
+</resultMap>
+	<select id="searchPdata" resultMap="resultData" parameterType="com.spm.model.DataBean">
+		select a.* from (	
+			select * from pdata where 1=1 and delete_flag='F'
+			limit #{num1} , #{rows}
+		) a
+	</select>
+	
+	
+	<select id="searchPdataCount" resultType="int" parameterType="com.spm.model.DataBean">
+		select count(a.id) count from (	
+			select * from pdata where 1=1 and delete_flag='F'
+		) a
+	</select>
+	
+	<select id="searchData" resultMap="resultData" parameterType="com.spm.model.DataBean">
+		select a.* from (	
+			select * from data where 1=1 and delete_flag='F'
+			and pId = #{pId}
+			limit #{num1} , #{rows}
+		) a
+	</select>
+	
+	
+	<select id="searchDataCount" resultType="int" parameterType="com.spm.model.DataBean">
+		select count(a.id) count from (	
+			select * from data where 1=1 and delete_flag='F'
+			and pId = #{pId}
+		) a
+	</select>
+	
+	
+	<select id="findEntity" resultMap="resultData" parameterType="com.spm.model.DataBean">
+		select a.id,a.dataName from data  a,pdata b where 1=1 and a.delete_flag='F' and b.delete_flag='F'
+		and b.id = a.pId
+		and b.dataCode=#{dataCode}
+	</select>
+	
+	
+	<select id="findEntityById" resultMap="resultData" parameterType="int">
+		select * from data  where id=#{id}
+	</select>
+	
+	<insert id="insertEntity" parameterType="com.spm.model.DataBean">
+	insert into data(pId,dataName,dataCode,create_date,create_user,update_date,update_user,delete_flag) 
+			  values(#{pId},#{dataName},#{dataCode},sysdate(),#{createUser},sysdate(),#{updateUser},'F') 
+	</insert>
+	
+	
+	<update id="updateEntityById" parameterType="com.spm.model.DataBean">
+	update data set
+		update_date = sysdate(),
+		update_user = #{updateUser}
+		<if test="dataName!=null and dataName!=''">
+			,dataName = #{dataName}
+		</if>
+		<if test="dataCode!=null and dataCode!=''">
+			,dataCode = #{dataCode}
+		</if>
+	where id = #{id}
+	</update>
+	
+	
+	<update id="deleteEntityById" parameterType="com.spm.model.DataBean">
+	update data set
+		update_date = sysdate(),
+		update_user = #{updateUser},
+		delete_flag = 'T'
+	where id = #{id}
+	</update>
+	
+	
+	
+</mapper>

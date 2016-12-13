@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spm.dao.MenuDao">
+<resultMap type="com.spm.model.MenuBean" id="resultMenu">
+<id property="id" column="id" javaType="Integer" jdbcType="INTEGER"/>
+<result property="name" column="name" javaType="String" jdbcType="VARCHAR"/>
+<result property="type" column="type" javaType="String" jdbcType="VARCHAR"/>
+<result property="url" column="url" javaType="String" jdbcType="VARCHAR"/>
+<result property="vId" column="vId" javaType="Integer" jdbcType="INTEGER"/>
+<result property="hId" column="hId" javaType="Integer" jdbcType="INTEGER"/>
+<result property="createDate" column="create_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="createUser" column="create_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateDate" column="update_date" javaType="String" jdbcType="VARCHAR"/>
+<result property="updateUser" column="update_user" javaType="String" jdbcType="VARCHAR"/>
+<result property="deleteFlag" column="delete_flag" javaType="String" jdbcType="VARCHAR"/>
+
+</resultMap>
+	
+	<select id="findLikeEntity" parameterType="com.spm.model.MenuBean" resultMap="resultMenu">
+	select * from menubean
+		where 1=1 and delete_flag="F" and style="normal"
+	<if test="type!='' and type!=null">
+		 and type=#{type}
+	</if>
+	<if test="vId!='' and vId!=null">
+		 and vId=#{vId}
+	</if>
+	<if test="hId!='' and hId!=null">
+		 and hId=#{hId}
+	</if>
+	</select>
+</mapper>
